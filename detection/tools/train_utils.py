@@ -68,7 +68,10 @@ def train_one_epoch(
         lr_scheduler.step()
 
         accumulated_iter += 1
-        disp_dict.update({'loss': loss.item(), 'lr': cur_lr})
+        
+        # Save loss value before clearing
+        loss_val = loss.item()
+        disp_dict.update({'loss': loss_val, 'lr': cur_lr})
 
         # log to console and tensorboard
         if rank == 0:
@@ -78,13 +81,18 @@ def train_one_epoch(
             tbar.refresh()
 
             if tb_log is not None:
-                tb_log.add_scalar('train/loss', loss, accumulated_iter)
+                tb_log.add_scalar('train/loss', loss_val, accumulated_iter)
                 tb_log.add_scalar(
                     'meta_data/learning_rate',
                     cur_lr,
                     accumulated_iter)
                 for key, val in tb_dict.items():
                     tb_log.add_scalar('train/' + key, val, accumulated_iter)
+        
+        # Clear memory after logging to prevent OOM
+        del loss, tb_dict, batch
+        if accumulated_iter % 10 == 0:
+            torch.cuda.empty_cache()
     
     if rank == 0:
         pbar.close()
