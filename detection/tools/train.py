@@ -7,7 +7,10 @@ from pathlib import Path
 import torch
 import torch.distributed as dist
 import torch.nn as nn
-from tensorboardX import SummaryWriter
+try:
+    from tensorboardX import SummaryWriter
+except Exception:
+    SummaryWriter = None
 
 from detzero_utils import common_utils
 from detzero_utils.config_utils import cfg, cfg_from_list, cfg_from_yaml_file, log_config_to_file
@@ -105,8 +108,10 @@ def main():
     if cfg.LOCAL_RANK == 0:
         os.system('cp %s %s' % (args.cfg_file, output_dir))
 
-    tb_log = SummaryWriter(log_dir=str(output_dir / 'tensorboard'), flush_secs=10, max_queue=30) \
-        if cfg.LOCAL_RANK == 0 else None
+    if cfg.LOCAL_RANK == 0 and SummaryWriter is not None:
+        tb_log = SummaryWriter(log_dir=str(output_dir / 'tensorboard'), flush_secs=10, max_queue=30)
+    else:
+        tb_log = None
 
     # -----------------------create dataloader & network & optimizer---------------------------
     train_set, train_loader, train_sampler = build_dataloader(

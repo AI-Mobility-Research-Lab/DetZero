@@ -8,7 +8,10 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from tensorboardX import SummaryWriter
+try:
+    from tensorboardX import SummaryWriter
+except Exception:
+    SummaryWriter = None
 
 from detzero_utils import common_utils
 from detzero_utils.config_utils import cfg, cfg_from_list, cfg_from_yaml_file, log_config_to_file
@@ -92,8 +95,10 @@ def repeat_eval_ckpt(model, test_loader, args, eval_output_dir, logger, ckpt_dir
         pass
 
     # tensorboard log
-    if cfg.LOCAL_RANK == 0:
+    if cfg.LOCAL_RANK == 0 and SummaryWriter is not None:
         tb_log = SummaryWriter(log_dir=str(eval_output_dir / ('tensorboard_%s' % cfg.DATA_CONFIG.DATA_SPLIT['test'])))
+    else:
+        tb_log = None
     total_time = 0
     first_eval = True
 
@@ -124,7 +129,7 @@ def repeat_eval_ckpt(model, test_loader, args, eval_output_dir, logger, ckpt_dir
             result_dir=cur_result_dir, save_to_file=args.save_to_file
         )
 
-        if cfg.LOCAL_RANK == 0:
+        if cfg.LOCAL_RANK == 0 and tb_log is not None:
             for key, val in tb_dict.items():
                 tb_log.add_scalar(key, val, cur_epoch_id)
 
