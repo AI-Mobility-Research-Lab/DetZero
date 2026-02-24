@@ -1,25 +1,49 @@
 # DetZero Installation Guide
 
-## System Requirements
+## Quick Start (Recommended)
 
-- Ubuntu 22.04 LTS
-- NVIDIA GPU with CUDA Compute Capability 7.0+ (V100, A100, RTX 3090, RTX 4090, etc.)
-- NVIDIA Driver 535+ (tested with 580.126.09)
-- CUDA Toolkit 12.1
-- Python 3.10
-- 16GB+ GPU VRAM recommended for training
-
-## Quick Start (GCP V100)
-
-For GCP deployment with V100 GPU, use the automated setup:
+For GCP V100 deployment with the **working configuration** (PyTorch 1.10 + CUDA 11.1):
 
 ```bash
-# From local machine
+# From local machine - create V100 instance
 export GCP_PROJECT_ID="your-project-id"
 bash cloud/gcp_setup_v100_standard.sh
+
+# SSH into instance
+gcloud compute ssh detzero-v100-training --zone=us-central1-a --project=your-project-id
+
+# Run setup script (PyTorch 1.10 + CUDA 11.1)
+wget https://raw.githubusercontent.com/AI-Mobility-Research-Lab/DetZero/main/cloud/gcp_instance_setup_pytorch110.sh
+bash gcp_instance_setup_pytorch110.sh
+
+# Upload dataset
+# (from local machine)
+gcloud compute scp --recurse /path/to/waymo_8k detzero-v100-training:~/ --zone=us-central1-a --project=your-project-id
+
+# Start training
+tmux new -s training
+cd ~/DetZero && bash scripts/train_8k_waymo_v100.sh
 ```
 
-See [GCP Deployment Guide](../cloud/GCP_DEPLOYMENT_GUIDE.md) for details.
+## System Requirements
+
+### Working Configuration (Verified)
+- Ubuntu 22.04 LTS
+- NVIDIA GPU with Compute Capability 7.0+ (V100, A100, etc.)
+- NVIDIA Driver 535+ (tested with 580.126.09)
+- **CUDA Toolkit 11.1** (critical - not 11.7, not 12.x)
+- **Python 3.8-3.10**
+- **PyTorch 1.10** (critical - not 1.13, not 2.x)
+- 16GB+ GPU VRAM recommended for training
+
+### Why These Specific Versions?
+
+DetZero's CUDA extensions were built for PyTorch 1.10 + CUDA 11.1. Using newer versions requires extensive code refactoring:
+- **PyTorch 2.x**: Removed THC headers, deprecated APIs
+- **CUDA 12.x**: Version mismatch with PyTorch 1.10
+- **PyTorch 1.13+**: Different CUDA version requirements
+
+See [Lessons Learned](LESSONS_LEARNED.md) for detailed version compatibility analysis.
 
 ## Manual Installation
 

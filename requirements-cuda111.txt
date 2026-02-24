@@ -1,0 +1,32 @@
+# DetZero Requirements for CUDA 11.1 (WORKING CONFIGURATION)
+# Based on original docs/INSTALL.md
+# Tested on Ubuntu 22.04 with NVIDIA Driver 535+
+
+# Core dependencies - EXACT versions from original project
+torch==1.10.0+cu111
+torchvision==0.11.0+cu111
+torchaudio==0.10.0
+--extra-index-url https://download.pytorch.org/whl/cu111
+
+# NumPy (compatible with PyTorch 1.10)
+numpy<1.24
+
+# Scientific computing
+scipy
+pyyaml
+easydict
+
+# Visualization and logging
+tqdm
+tensorboard
+
+# 3D point cloud processing (CUDA 11.1 version)
+spconv-cu111
+
+# Waymo evaluation
+waymo-open-dataset-tf-2-5-0
+
+# Development tools (optional)
+# pytest
+# black
+# flake8
