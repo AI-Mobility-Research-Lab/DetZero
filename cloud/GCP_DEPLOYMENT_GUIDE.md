@@ -199,6 +199,38 @@ gcloud compute machine-types list --filter="name:a2-highgpu-1g" --format="table(
 
 ## Troubleshooting
 
+### A100 Resource Exhausted Error
+```
+ERROR: ZONE_RESOURCE_POOL_EXHAUSTED
+The zone does not have enough resources available
+```
+
+**Solution 1: Use Auto Zone Selection Script**
+```bash
+# Tries multiple zones automatically until one succeeds
+bash cloud/gcp_setup_auto.sh
+```
+
+**Solution 2: Try Different Zones Manually**
+```bash
+# Try us-central1 (Iowa) - usually has better availability
+export GCP_ZONE="us-central1-a"
+bash cloud/gcp_setup.sh
+
+# Or try us-west1 (Oregon)
+export GCP_ZONE="us-west1-b"
+bash cloud/gcp_setup.sh
+```
+
+**Solution 3: Use Preemptible Instance (70% cheaper)**
+```bash
+# Edit cloud/gcp_setup.sh and add --preemptible flag
+# Preemptible instances have better availability but can be terminated
+```
+
+**Solution 4: Try Later**
+A100 availability changes frequently. Try again in a few hours.
+
 ### GPU Quota Error
 ```
 ERROR: Quota 'NVIDIA_A100_GPUS' exceeded
