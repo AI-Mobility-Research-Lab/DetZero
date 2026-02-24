@@ -39,7 +39,7 @@ gcloud compute instances create $INSTANCE_NAME \
     --accelerator=type=nvidia-tesla-a100,count=1 \
     --boot-disk-size=$BOOT_DISK_SIZE \
     --boot-disk-type=pd-ssd \
-    --image-family=ubuntu-2004-lts \
+    --image-family=ubuntu-2204-lts \
     --image-project=ubuntu-os-cloud \
     --maintenance-policy=TERMINATE \
     --metadata=install-nvidia-driver=True \
