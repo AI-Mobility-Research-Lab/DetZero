@@ -25,20 +25,28 @@ sudo apt-get install -y \
     python3-pip \
     python3-dev
 
-# Verify NVIDIA driver
-echo "Verifying NVIDIA driver..."
-nvidia-smi
-
-# Install CUDA toolkit (if not already installed)
-if ! command -v nvcc &> /dev/null; then
-    echo "Installing CUDA toolkit..."
+# Install NVIDIA drivers and CUDA
+if ! command -v nvidia-smi &> /dev/null; then
+    echo "Installing NVIDIA drivers and CUDA toolkit..."
+    
+    # Add NVIDIA package repositories
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
     sudo dpkg -i cuda-keyring_1.1-1_all.deb
     sudo apt-get update
-    sudo apt-get -y install cuda-toolkit-12-1
-    echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-    source ~/.bashrc
+    
+    # Install CUDA (includes drivers)
+    sudo apt-get -y install cuda-12-1
+    
+    # Add to PATH
+    echo 'export PATH=/usr/local/cuda-12.1/bin:$PATH' >> ~/.bashrc
+    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+    
+    echo ""
+    echo "NVIDIA drivers installed. Verifying..."
+    /usr/bin/nvidia-smi
+else
+    echo "NVIDIA driver already installed."
+    nvidia-smi
 fi
 
 # Install Python dependencies
@@ -83,10 +91,15 @@ echo "=========================================="
 echo "Setup Complete!"
 echo "=========================================="
 echo "GPU Info:"
-nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
+/usr/bin/nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
 echo ""
 echo "Next steps:"
-echo "1. Upload dataset: gsutil -m rsync -r gs://your-bucket/waymo_8k /mnt/data/"
-echo "2. Or use gcloud compute scp to copy from local machine"
-echo "3. Start training: cd ~/DetZero && bash scripts/train_8k_waymo_a100.sh"
+echo "1. Upload dataset from local machine:"
+echo "   gcloud compute scp --recurse /home/aimob/projects/OpenPCDet/data/waymo_8k detzero-v100-training:/mnt/data/ --zone=us-central1-a --project=detzeroaimob"
+echo ""
+echo "2. Or use gsutil if data is in Cloud Storage:"
+echo "   gsutil -m rsync -r gs://your-bucket/waymo_8k /mnt/data/"
+echo ""
+echo "3. Start training:"
+echo "   cd ~/DetZero && bash scripts/train_8k_waymo_v100.sh"
 echo "=========================================="
