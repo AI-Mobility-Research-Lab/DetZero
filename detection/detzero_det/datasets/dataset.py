@@ -110,7 +110,7 @@ class DatasetTemplate(torch.utils.data.Dataset):
         input_dict = {
             'points': points,
             'frame_id': current_info['sample_idx'],
-            'pose': current_info['pose'],
+            'pose': current_info.get('pose', np.eye(4)),  # Default to identity if missing
             'sequence_name': current_info['sequence_name'],
         }
             
@@ -166,27 +166,46 @@ class DatasetTemplate(torch.utils.data.Dataset):
     @staticmethod
     def merge_sweeps(info, target_infos, points):
         """
-        TODO: Docstrings
-
+        Merge multiple sweeps into a single point cloud.
+        Handles both 4-channel (nuScenes) and 6-channel (Waymo) point clouds.
+        For single-sweep (sweep_count=[0,0]), pose is optional.
         """
-
-        current_pose = info["pose"]
-        current_time = info["time_stamp"]
+        # Check if we need pose transformation
+        need_pose = len(target_infos) > 1 or (len(target_infos) == 1 and target_infos[0].get('sample_idx', 0) != info.get('sample_idx', -1))
+        
+        if need_pose:
+            current_pose = info["pose"]
+            current_time = info["time_stamp"]
         
         point_clouds = []
         for i in range(len(target_infos)):
             target_info = target_infos[i]
             current_points = points[i]
 
-            current_points, NLZ_flag = current_points[:, 0:5], current_points[:, 5]
-            current_points = current_points[NLZ_flag == -1]
+            # Handle both 4-channel (nuScenes) and 6-channel (Waymo) formats
+            if current_points.shape[1] == 6:
+                # Waymo format: [x, y, z, intensity, elongation, NLZ_flag]
+                current_points, NLZ_flag = current_points[:, 0:5], current_points[:, 5]
+                current_points = current_points[NLZ_flag == -1]
+            elif current_points.shape[1] == 4:
+                # nuScenes format: [x, y, z, intensity]
+                # Add dummy elongation channel
+                current_points = np.concatenate([current_points, np.zeros((current_points.shape[0], 1))], axis=1)
+            else:
+                raise ValueError(f"Unexpected point cloud shape: {current_points.shape}")
+            
             current_points[:, 3] = np.tanh(current_points[:, 3])    # process the intensity into [-1, 1]
 
-            transform_mat = np.linalg.inv(current_pose) @ target_info['pose']
-            delta_time = int(target_info['time_stamp']) - int(current_time)
-            current_points[:, :3] = np.concatenate([current_points[:, :3], np.ones((current_points.shape[0], 1))],
-                                                   axis=1) @ transform_mat[:3, :].T
-            time_offset = float(delta_time) / 1000000. * np.ones((current_points.shape[0], 1))
+            if need_pose:
+                transform_mat = np.linalg.inv(current_pose) @ target_info['pose']
+                delta_time = int(target_info['time_stamp']) - int(current_time)
+                current_points[:, :3] = np.concatenate([current_points[:, :3], np.ones((current_points.shape[0], 1))],
+                                                       axis=1) @ transform_mat[:3, :].T
+                time_offset = float(delta_time) / 1000000. * np.ones((current_points.shape[0], 1))
+            else:
+                # Single sweep, no transformation needed
+                time_offset = np.zeros((current_points.shape[0], 1))
+            
             current_points = np.concatenate([current_points, time_offset], axis=1)
             point_clouds.append(current_points)
 
