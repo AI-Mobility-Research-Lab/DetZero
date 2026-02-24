@@ -1,0 +1,28 @@
+# DetZero Requirements for CUDA 12.1
+# Tested on Ubuntu 22.04 with NVIDIA Driver 580.126.09
+
+# Core dependencies
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# NumPy (must be <2.0 for PyTorch 2.1 compatibility)
+numpy<2.0
+
+# Scientific computing
+scipy
+pyyaml
+easydict
+
+# Visualization and logging
+tqdm
+tensorboard
+
+# 3D point cloud processing
+spconv-cu121
+
+# Development tools (optional)
+# pytest
+# black
+# flake8
