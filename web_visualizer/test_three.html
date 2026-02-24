@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Import Test</title>
+</head>
+<body>
+    <h1>Three.js Import Test</h1>
+    <div id="status">Testing...</div>
+    <pre id="output"></pre>
+
+    <script type="module">
+        const statusDiv = document.getElementById('status');
+        const outputDiv = document.getElementById('output');
+        
+        try {
+            statusDiv.textContent = 'Importing THREE...';
+            
+            const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+            statusDiv.textContent = 'THREE imported. Importing OrbitControls...';
+            
+            const { OrbitControls } = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js');
+            
+            statusDiv.textContent = '✅ All imports successful!';
+            statusDiv.style.color = 'green';
+            
+            outputDiv.textContent = `THREE version: ${THREE.REVISION}\nOrbitControls: ${typeof OrbitControls}`;
+            
+        } catch (error) {
+            statusDiv.textContent = '❌ Error: ' + error.message;
+            statusDiv.style.color = 'red';
+            outputDiv.textContent = error.stack;
+            console.error('Import error:', error);
+        }
+    </script>
+</body>
+</html>

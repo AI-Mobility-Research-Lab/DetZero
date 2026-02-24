@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+  command = "echo 'No build required'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+
+# Redirects disabled - not needed for this static site
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200

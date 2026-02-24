@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Loading Test</title>
+</head>
+<body>
+    <h1>Data Loading Test</h1>
+    <div id="status">Testing...</div>
+    <pre id="output"></pre>
+
+    <script>
+        async function testDataLoading() {
+            const statusDiv = document.getElementById('status');
+            const outputDiv = document.getElementById('output');
+            
+            try {
+                statusDiv.textContent = 'Loading detection data...';
+                const detectionResponse = await fetch('data/detection_data.json');
+                statusDiv.textContent = `Detection response status: ${detectionResponse.status}`;
+                
+                const detectionData = await detectionResponse.json();
+                statusDiv.textContent = 'Loading refined data...';
+                
+                const refinedResponse = await fetch('data/refined_data.json');
+                const refinedData = await refinedResponse.json();
+                
+                statusDiv.textContent = '✅ Data loaded successfully!';
+                statusDiv.style.color = 'green';
+                
+                outputDiv.textContent = JSON.stringify({
+                    detection: {
+                        frames: detectionData.length,
+                        firstFrame: detectionData[0]?.frame_id,
+                        firstBoxCount: detectionData[0]?.boxes?.length
+                    },
+                    refined: {
+                        frames: refinedData.length,
+                        firstFrame: refinedData[0]?.frame_id,
+                        firstBoxCount: refinedData[0]?.boxes?.length
+                    }
+                }, null, 2);
+                
+            } catch (error) {
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.style.color = 'red';
+                outputDiv.textContent = error.stack;
+            }
+        }
+        
+        testDataLoading();
+    </script>
+</body>
+</html>

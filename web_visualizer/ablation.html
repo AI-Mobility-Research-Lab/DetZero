@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DetZero Ablation Study - GRM vs PRM vs CRM</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        #sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        #viewer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #grid-view {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 2px;
+        }
+        
+        .view-panel {
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.3);
+            min-width: 0;
+            min-height: 0;
+        }
+        
+        .view-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+            z-index: 10;
+        }
+        
+        .view-stats {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            z-index: 10;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .canvas-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        
+        .stat-row:last-child { border-bottom: none; }
+        
+        .stat-label { color: #666; }
+        .stat-value { color: #333; font-weight: bold; }
+        
+        button {
+            width: 100%;
+            padding: 8px;
+            margin: 4px 0;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        button:hover { background: #5568d3; }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #info-panel {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px;
+            font-size: 12px;
+        }
+        
+        .highlight { color: #4ade80; font-weight: bold; }
+        .warning { color: #fbbf24; font-weight: bold; }
+        .error { color: #f87171; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>Loading ablation study data...</div>
+    </div>
+    
+    <div id="container" style="display: none;">
+        <div id="sidebar">
+            <h1>🔬 DetZero Ablation Study</h1>
+            
+            <div class="section">
+                <h3>📊 Current Frame</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Slider Index:</span>
+                    <span class="stat-value" id="current-frame">0 / 0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Actual Frame ID:</span>
+                    <span class="stat-value" id="actual-frame-id">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Sequence:</span>
+                    <span class="stat-value" id="sequence-name" style="font-size: 10px;">-</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>📈 Box Counts</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Detection:</span>
+                    <span class="stat-value" id="det-boxes">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">+ GRM + PRM:</span>
+                    <span class="stat-value" id="grm-prm-boxes">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">+ Full (GRM+PRM+CRM):</span>
+                    <span class="stat-value" id="full-boxes">0</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>🎮 Controls</h3>
+                <label for="frame-slider" style="font-size: 12px; color: #666;">
+                    Frame: <span id="frame-number">0</span>
+                </label>
+                <input type="range" id="frame-slider" min="0" max="0" value="0">
+                <button id="play-btn">▶️ Play</button>
+                <button id="prev-btn">⏮️ Previous</button>
+                <button id="next-btn">⏭️ Next</button>
+                <button id="reset-view-btn">🔄 Reset View</button>
+            </div>
+            
+            <div class="section">
+                <h3>ℹ️ About</h3>
+                <p style="font-size: 11px; color: #666; line-height: 1.4;">
+                    Compare the effect of refinement modules:
+                    <br><br>
+                    <strong>Left:</strong> Detection only (baseline)<br>
+                    <strong>Middle:</strong> + GRM + PRM<br>
+                    <strong>Right:</strong> + CRM (full pipeline)
+                </p>
+            </div>
+        </div>
+        
+        <div id="viewer-container">
+            <div id="grid-view">
+                <div class="view-panel">
+                    <div class="view-label">Detection Only</div>
+                    <div class="view-stats" id="stats-det"></div>
+                    <div class="canvas-container" id="canvas-det"></div>
+                </div>
+                <div class="view-panel">
+                    <div class="view-label">Detection + GRM + PRM</div>
+                    <div class="view-stats" id="stats-grm-prm"></div>
+                    <div class="canvas-container" id="canvas-grm-prm"></div>
+                </div>
+                <div class="view-panel">
+                    <div class="view-label">Full Pipeline (+ CRM)</div>
+                    <div class="view-stats" id="stats-full"></div>
+                    <div class="canvas-container" id="canvas-full"></div>
+                </div>
+            </div>
+            <div id="info-panel">
+                <strong>🎯 Controls:</strong> Mouse: Rotate/Pan/Zoom | 
+                Use slider or buttons to navigate frames | 
+                Compare how each module affects detection results
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="ablation.js"></script>
+</body>
+</html>

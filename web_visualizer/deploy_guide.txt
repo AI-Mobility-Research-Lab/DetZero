@@ -1,0 +1,79 @@
+╔══════════════════════════════════════════════════════════════╗
+║         DetZero 3D Visualizer - Netlify Deployment          ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ You're logged in as: Bo Shang (cnpcshangbo@gmail.com)
+✅ Team: AI & Mobility Research Lab
+✅ All files ready (650KB)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: Run Deployment Command
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copy and paste this command:
+
+    netlify deploy --dir=. --prod
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2: Answer Prompts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Prompt 1: "What would you like to do?"
+→ Select: "+ Create & configure a new project"
+→ Press: Enter
+
+Prompt 2: "Team:"
+→ Select: "AI & Mobility Research Lab"
+→ Press: Enter
+
+Prompt 3: "Site name (optional):"
+→ Type: "detzero-3d-viz"
+→ Press: Enter
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3: Wait for Deployment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You'll see:
+  ✔ Finished hashing
+  ✔ CDN requesting files
+  ✔ Finished uploading
+  ✔ Deploy is live!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 4: Get Your URL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your site will be live at:
+
+    https://detzero-3d-viz.netlify.app
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 5: Test Your Site
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Open the URL and verify:
+  ✓ Page loads
+  ✓ Both 3D views show boxes
+  ✓ Frame slider works
+  ✓ Statistics update
+  ✓ Mouse controls work
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Deploy:         netlify deploy --dir=. --prod
+Open site:      netlify open:site
+View logs:      netlify logs
+Check status:   netlify status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ready to deploy? Run the command above! 🚀
