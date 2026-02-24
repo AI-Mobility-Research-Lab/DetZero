@@ -5,7 +5,7 @@
 set -e
 
 # Configuration
-PROJECT_ID="${GCP_PROJECT_ID:-your-project-id}"
+PROJECT_ID="${GCP_PROJECT_ID:-detzeroaimob}"  # Your actual project ID
 ZONE="${GCP_ZONE:-us-central1-a}"
 INSTANCE_NAME="${GCP_INSTANCE_NAME:-detzero-v100-training}"
 MACHINE_TYPE="n1-highmem-8"  # 8 vCPUs, 52 GB RAM
