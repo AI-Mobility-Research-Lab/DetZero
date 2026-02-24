@@ -1,0 +1,63 @@
+╔══════════════════════════════════════════════════════════════╗
+║                  QUICK DEPLOYMENT GUIDE                      ║
+║              DetZero 3D Visualizer → Netlify                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+🚨 ISSUE: Netlify CLI stuck in interactive mode
+   All terminal commands are being captured by the prompt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ FASTEST SOLUTION: Netlify Drop (30 seconds)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Open: https://app.netlify.com/drop
+
+2. Drag: web_visualizer folder
+
+3. Done! Get your URL
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 ALTERNATIVE: Complete Interactive Prompt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Find the terminal showing:
+  "? Project name (leave blank for a random name):"
+
+Type: detzero-3d-viz
+Press: Enter
+
+Select team: AI & Mobility Research Lab
+Press: Enter
+
+Wait for deployment...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 What Gets Deployed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 3D Visualization (Three.js)
+✅ 50 frames of data
+✅ 560 detection boxes
+✅ 1,246 refined boxes
+✅ Interactive controls
+✅ Side-by-side comparison
+
+Total: ~650KB
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ After Deployment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Open URL → Test 3D views → Share with team!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Full Docs: See DEPLOYMENT_STATUS.md
+
+🎯 Recommended: Use Netlify Drop (easiest!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

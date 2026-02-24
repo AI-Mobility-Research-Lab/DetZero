@@ -1,0 +1,81 @@
+╔══════════════════════════════════════════════════════════════╗
+║           WEB VISUALIZER - QUICK FIX GUIDE                   ║
+╚══════════════════════════════════════════════════════════════╝
+
+🚨 PROBLEM: "Loading visualization data..." forever
+
+🔍 CAUSE: Missing JSON data files in web_visualizer/data/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ FIX (3 steps, 2 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: Open NEW Terminal
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Open a fresh terminal (not the one stuck in Netlify)
+
+cd /home/aimob/projects/DetZero
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2: Generate Data Files
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Run this command:
+
+python3 web_visualizer/prepare_data.py \
+    --detection data/waymo_custom/detection/result/Vehicle.pkl \
+    --refined data/waymo_custom/refining/result/Vehicle_final_frame.pkl \
+    --output_dir web_visualizer/data \
+    --max_frames 50
+
+Wait ~30 seconds...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3: Redeploy
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Go to: https://app.netlify.com/drop
+2. Drag: web_visualizer folder
+3. Open new URL
+4. Done! ✨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 What Gets Created
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+web_visualizer/data/
+├── detection_data.json  (203KB) - 560 boxes
+├── refined_data.json    (440KB) - 1,246 boxes
+└── summary.json         (254B)  - Statistics
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ After Fix
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Page loads immediately
+✓ Both 3D views show boxes
+✓ Frame slider works (0-49)
+✓ Statistics show correct numbers
+✓ Play button works
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 If Stuck
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Kill Netlify CLI:
+  pkill -9 netlify
+
+Then try again!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Full Details: See FIX_WEB_VISUALIZER.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
