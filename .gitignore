@@ -20,3 +20,44 @@ venv/
 *version.py
 *.npy
 *.DS_Store
+.env
+node_modules
+
+# Local Netlify folder
+.netlify
+.hypothesis/
+detection/output/
+.kiro/
+refining/output/
+
+# Temporary files
+*.log
+/tmp/
+test_output/
+
+# Documentation (keep in docs/)
+/*.md
+!README.md
+!LICENSE
+
+# Debug and test scripts
+check_*.py
+debug_*.py
+compare_*.py
+fix_*.py
+visualize_*.py
+plot_*.py
+convert_to_openpcdet.py
+*.sh
+!scripts/**/*.sh
+
+# Generated images
+*.png
+!docs/**/*.png
+
+# Package files
+package-lock.json
+package.json
+
+# Web visualizer data
+web_visualizer/data/
