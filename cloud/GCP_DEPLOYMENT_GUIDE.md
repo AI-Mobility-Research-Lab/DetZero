@@ -29,9 +29,9 @@ Deploy DetZero training on Google Cloud A100 GPU for faster training:
 ### 1. Configure GCP Project
 
 ```bash
-# Set your project ID
+# Set your project ID and zone
 export GCP_PROJECT_ID="your-project-id"
-export GCP_ZONE="us-central1-a"  # Choose zone with A100 availability
+export GCP_ZONE="us-east4-c"  # Best for NYC - Northern Virginia
 
 # Login to GCP
 gcloud auth login
@@ -173,12 +173,24 @@ gcloud compute instances stop detzero-a100-training --zone=$GCP_ZONE
 gcloud compute instances start detzero-a100-training --zone=$GCP_ZONE
 ```
 
-### 4. Use Cheaper Zones
-- us-central1: $3.67/hour
-- us-west1: $3.67/hour
-- europe-west4: $4.03/hour
+### 4. Choose Optimal Zone
 
-Check pricing: https://cloud.google.com/compute/gpus-pricing
+**For New York / East Coast**:
+
+| Zone | Location | A100 Price/hr | Latency | Recommendation |
+|------|----------|---------------|---------|----------------|
+| **us-east4** | Northern Virginia | **$3.67** | ~10ms | ✅ **Best choice** |
+| us-east1 | South Carolina | $3.67 | ~20ms | Good |
+| northamerica-northeast1 | Montreal | $4.03 | ~15ms | More expensive |
+| northamerica-northeast2 | Toronto | $4.03 | ~20ms | More expensive |
+| us-central1 | Iowa | $3.67 | ~30ms | Farther |
+
+**Recommendation for NYC**: Use **us-east4** (Northern Virginia)
+- Lowest price: $3.67/hour
+- Best latency: ~10ms from NYC
+- Good A100 availability
+
+Check current pricing: https://cloud.google.com/compute/gpus-pricing
 
 ## Troubleshooting
 

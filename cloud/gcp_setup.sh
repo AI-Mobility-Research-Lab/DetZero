@@ -5,7 +5,7 @@ set -e
 
 # Configuration
 PROJECT_ID="${GCP_PROJECT_ID:-your-project-id}"
-ZONE="${GCP_ZONE:-us-central1-a}"
+ZONE="${GCP_ZONE:-us-east4-c}"  # Best for NYC/East Coast
 INSTANCE_NAME="${GCP_INSTANCE_NAME:-detzero-a100-training}"
 MACHINE_TYPE="a2-highgpu-1g"  # 1x A100 40GB, 12 vCPUs, 85 GB RAM
 BOOT_DISK_SIZE="200GB"
