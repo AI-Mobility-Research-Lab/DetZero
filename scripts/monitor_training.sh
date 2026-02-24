@@ -1,24 +1,25 @@
 #!/bin/bash
-# Monitor training process and send Telegram alert if it crashes
+# Monitor training process and send alert if it crashes
 
 # Configuration
 TRAINING_PID_FILE="/tmp/detzero_training.pid"
 CHECK_INTERVAL=60  # Check every 60 seconds
+ALERT_LOG="/tmp/detzero_training_alert.log"
 
-# IMPORTANT: Set your Telegram chat ID here
-# To get your chat ID:
-# 1. Start a chat with your OpenClaw bot on Telegram
-# 2. Send any message to the bot
-# 3. Run: openclaw directory peers list --channel telegram
-# 4. Find your chat ID and set it below (e.g., "123456789" or "-100123456789" for groups)
-TELEGRAM_TARGET=""  # Set your chat ID here (e.g., "123456789")
+# Notification method: "whatsapp", "telegram", "email", or "log"
+NOTIFY_METHOD="log"
 
-if [ -z "$TELEGRAM_TARGET" ]; then
-    echo "✗ ERROR: TELEGRAM_TARGET not set!"
-    echo "Please edit this script and set your Telegram chat ID"
-    echo "See instructions in the script header"
-    exit 1
-fi
+# WhatsApp configuration (if using WhatsApp)
+WHATSAPP_TARGET=""  # Your phone number in E.164 format (e.g., "+1234567890")
+
+# Telegram configuration (if using Telegram)
+TELEGRAM_TARGET=""  # Your Telegram chat ID (e.g., "123456789")
+
+# Email configuration (if using email)
+EMAIL_TO=""  # Your email address
+EMAIL_FROM="${EMAIL_FROM:-training-monitor@localhost}"
+SMTP_HOST="${SMTP_HOST:-localhost}"
+SMTP_PORT="${SMTP_PORT:-25}"
 
 # Get the current training PID
 get_training_pid() {
@@ -35,14 +36,51 @@ is_running() {
     return $?
 }
 
-# Send Telegram notification
-send_telegram() {
+# Send notification based on configured method
+send_notification() {
     local message="$1"
-    openclaw message send \
-        --channel telegram \
-        --target "$TELEGRAM_TARGET" \
-        --message "$message" \
-        2>&1 | grep -q "success" && echo "✓ Telegram notification sent" || echo "✗ Failed to send Telegram notification"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    case "$NOTIFY_METHOD" in
+        whatsapp)
+            if [ -z "$WHATSAPP_TARGET" ]; then
+                echo "✗ WhatsApp target not configured"
+                return 1
+            fi
+            openclaw message send \
+                --channel whatsapp \
+                --target "$WHATSAPP_TARGET" \
+                --message "$message" \
+                2>&1 | grep -q "success" && echo "✓ WhatsApp notification sent" || echo "✗ Failed to send WhatsApp"
+            ;;
+        telegram)
+            if [ -z "$TELEGRAM_TARGET" ]; then
+                echo "✗ Telegram target not configured"
+                return 1
+            fi
+            openclaw message send \
+                --channel telegram \
+                --target "$TELEGRAM_TARGET" \
+                --message "$message" \
+                2>&1 | grep -q "success" && echo "✓ Telegram notification sent" || echo "✗ Failed to send Telegram"
+            ;;
+        email)
+            if [ -z "$EMAIL_TO" ]; then
+                echo "✗ Email recipient not configured"
+                return 1
+            fi
+            echo "$message" | mail -s "DetZero Training Alert" "$EMAIL_TO" \
+                && echo "✓ Email notification sent" || echo "✗ Failed to send email"
+            ;;
+        log)
+            echo "[$timestamp] $message" >> "$ALERT_LOG"
+            echo "✓ Alert logged to $ALERT_LOG"
+            ;;
+        *)
+            echo "✗ Unknown notification method: $NOTIFY_METHOD"
+            return 1
+            ;;
+    esac
 }
 
 # Get GPU status
@@ -54,7 +92,13 @@ get_gpu_status() {
 echo "=========================================="
 echo "DetZero Training Monitor"
 echo "=========================================="
-echo "Telegram target: $TELEGRAM_TARGET"
+echo "Notification method: $NOTIFY_METHOD"
+case "$NOTIFY_METHOD" in
+    whatsapp) echo "WhatsApp target: $WHATSAPP_TARGET" ;;
+    telegram) echo "Telegram target: $TELEGRAM_TARGET" ;;
+    email) echo "Email to: $EMAIL_TO" ;;
+    log) echo "Alert log: $ALERT_LOG" ;;
+esac
 echo "Check interval: ${CHECK_INTERVAL}s"
 echo "=========================================="
 
@@ -63,7 +107,7 @@ CURRENT_PID=$(get_training_pid)
 
 if [ -z "$CURRENT_PID" ]; then
     echo "✗ No training process found!"
-    send_telegram "⚠️ DetZero Training Monitor: No training process found at startup"
+    send_notification "⚠️ DetZero Training Monitor: No training process found at startup"
     exit 1
 fi
 
@@ -72,7 +116,7 @@ echo "$CURRENT_PID" > "$TRAINING_PID_FILE"
 
 # Send startup notification
 GPU_STATUS=$(get_gpu_status)
-send_telegram "🚀 DetZero Training Monitor Started
+send_notification "🚀 DetZero Training Monitor Started
 
 PID: $CURRENT_PID
 GPU: $GPU_STATUS
@@ -105,7 +149,7 @@ while true; do
         if [ -n "$LATEST_LOG" ]; then
             LAST_LINES=$(tail -20 "$LATEST_LOG" | grep -E "(Error|Exception|Traceback|CUDA|OOM)" | tail -5)
             
-            send_telegram "🔴 DetZero Training CRASHED!
+            send_notification "🔴 DetZero Training CRASHED!
 
 PID: $CURRENT_PID
 Time: $(date '+%Y-%m-%d %H:%M:%S')
@@ -117,7 +161,7 @@ $LAST_LINES
 
 Log: $LATEST_LOG"
         else
-            send_telegram "🔴 DetZero Training CRASHED!
+            send_notification "🔴 DetZero Training CRASHED!
 
 PID: $CURRENT_PID
 Time: $(date '+%Y-%m-%d %H:%M:%S')
