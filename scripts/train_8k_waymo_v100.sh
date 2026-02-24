@@ -32,7 +32,7 @@ echo ""
 echo "Starting training..."
 
 # Run training
-python tools/train.py \
+python3 tools/train.py \
     --cfg_file $CFG_FILE \
     --batch_size $BATCH_SIZE \
     --epochs $EPOCHS \
