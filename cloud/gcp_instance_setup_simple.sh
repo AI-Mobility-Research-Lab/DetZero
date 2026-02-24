@@ -1,11 +1,43 @@
 #!/bin/bash
-# Working instance setup script for Ubuntu 22.04 on GCP
+# Simple instance setup - assumes drivers already installed or will reboot if needed
 
 set -e
 
 echo "=========================================="
 echo "DetZero Instance Setup"
 echo "=========================================="
+
+# Check if nvidia-smi works
+if ! nvidia-smi &>/dev/null; then
+    echo "NVIDIA drivers not working. Installing/rebooting..."
+    
+    # Update system
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    
+    # Install essential packages
+    sudo apt-get install -y \
+        git wget curl vim tmux htop \
+        build-essential python3-pip python3-dev \
+        ubuntu-drivers-common
+    
+    # Install drivers
+    sudo ubuntu-drivers install
+    
+    echo ""
+    echo "=========================================="
+    echo "Drivers installed. Rebooting in 5 seconds..."
+    echo "After reboot, run this script again:"
+    echo "  bash /tmp/gcp_instance_setup.sh"
+    echo "=========================================="
+    sleep 5
+    sudo reboot
+    exit 0
+fi
+
+# If we get here, nvidia-smi works
+echo "NVIDIA driver verified:"
+nvidia-smi
 
 # Update system
 echo "Updating system packages..."
@@ -18,24 +50,11 @@ sudo apt-get install -y \
     git wget curl vim tmux htop \
     build-essential python3-pip python3-dev
 
-# Install NVIDIA drivers (GCP provides these in their repos)
-echo "Installing NVIDIA drivers..."
-sudo apt-get install -y ubuntu-drivers-common
-sudo ubuntu-drivers install
-
-echo ""
-echo "=========================================="
-echo "Driver installation complete!"
-echo "REBOOT REQUIRED to load new drivers"
-echo "=========================================="
-echo "Please run: sudo reboot"
-echo "Then SSH back in and run this script again"
-echo "=========================================="
-exit 0
-
 # Install CUDA toolkit
 echo "Installing CUDA toolkit..."
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+if [ ! -f cuda-keyring_1.1-1_all.deb ]; then
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+fi
 sudo dpkg -i cuda-keyring_1.1-1_all.deb
 sudo apt-get update
 sudo apt-get -y install cuda-toolkit-12-1
