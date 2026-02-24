@@ -11,8 +11,8 @@ INSTANCE_NAME="${GCP_INSTANCE_NAME:-detzero-v100-training}"
 MACHINE_TYPE="n1-highmem-8"  # 8 vCPUs, 52 GB RAM
 GPU_TYPE="nvidia-tesla-v100"
 GPU_COUNT=1
-BOOT_DISK_SIZE="200GB"
-DATA_DISK_SIZE="500GB"
+BOOT_DISK_SIZE="100GB"  # Reduced from 200GB
+DATA_DISK_SIZE="200GB"  # Reduced from 500GB (total: 300GB < 500GB limit)
 
 echo "=========================================="
 echo "DetZero GCP V100 Setup"
