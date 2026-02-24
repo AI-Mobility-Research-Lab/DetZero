@@ -20,7 +20,7 @@ Deploy DetZero training on Google Cloud A100 GPU for faster training:
 **A100 Instance (a2-highgpu-1g)**:
 - 1x A100 40GB GPU
 - 12 vCPUs, 85 GB RAM
-- Cost: ~$3.67/hour (us-central1)
+- Cost: ~$3.67/hour (us-east4)
 - Training time: ~2-3 hours
 - **Total cost: ~$7-11 per training run**
 
@@ -30,8 +30,8 @@ Deploy DetZero training on Google Cloud A100 GPU for faster training:
 
 ```bash
 # Set your project ID and zone
-export GCP_PROJECT_ID="your-project-id"
-export GCP_ZONE="us-east4-c"  # Best for NYC - Northern Virginia
+export GCP_PROJECT_ID="detzeroaimob"
+export GCP_ZONE="us-east1-b"  # Best for NYC - has A100 availability
 
 # Login to GCP
 gcloud auth login
@@ -177,20 +177,25 @@ gcloud compute instances start detzero-a100-training --zone=$GCP_ZONE
 
 **For New York / East Coast**:
 
-| Zone | Location | A100 Price/hr | Latency | Recommendation |
-|------|----------|---------------|---------|----------------|
-| **us-east4** | Northern Virginia | **$3.67** | ~10ms | ✅ **Best choice** |
-| us-east1 | South Carolina | $3.67 | ~20ms | Good |
-| northamerica-northeast1 | Montreal | $4.03 | ~15ms | More expensive |
-| northamerica-northeast2 | Toronto | $4.03 | ~20ms | More expensive |
-| us-central1 | Iowa | $3.67 | ~30ms | Farther |
+| Zone | Location | A100 Available | Price/hr | Latency | Recommendation |
+|------|----------|----------------|----------|---------|----------------|
+| **us-east1-b** | South Carolina | ✅ Yes | **$3.67** | ~20ms | ✅ **Best choice** |
+| us-east4 | Northern Virginia | ❌ No A100 | - | ~10ms | No A100 |
+| northamerica-northeast1-a | Montreal | ✅ Yes | $4.03 | ~15ms | More expensive |
+| us-central1-a | Iowa | ✅ Yes | $3.67 | ~30ms | Farther |
 
-**Recommendation for NYC**: Use **us-east4** (Northern Virginia)
+**Recommendation for NYC**: Use **us-east1-b** (South Carolina)
+- A100 available: ✅
 - Lowest price: $3.67/hour
-- Best latency: ~10ms from NYC
-- Good A100 availability
+- Acceptable latency: ~20ms from NYC
+- Good availability
 
-Check current pricing: https://cloud.google.com/compute/gpus-pricing
+**Note**: us-east4 (Virginia) doesn't have A100 GPUs. us-east1-b is the closest zone with A100 availability.
+
+Check A100 availability: 
+```bash
+gcloud compute machine-types list --filter="name:a2-highgpu-1g" --format="table(zone,name)"
+```
 
 ## Troubleshooting
 
