@@ -53,28 +53,39 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64:$LD_LIBRARY_PATH
 echo "Verifying CUDA 11.1..."
 nvcc --version
 
-# Upgrade pip
-echo "Upgrading pip..."
-pip3 install --upgrade pip
+# Install Miniconda
+echo "Installing Miniconda..."
+if [ ! -d "$HOME/miniconda3" ]; then
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    bash miniconda.sh -b -p $HOME/miniconda3
+    rm miniconda.sh
+fi
 
-# Install PyTorch 1.10 with CUDA 11.1
+# Initialize conda
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+$HOME/miniconda3/bin/conda init bash
+source ~/.bashrc
+
+# Create conda environment
+echo "Creating conda environment 'detzero'..."
+conda create -n detzero python=3.8 -y
+conda activate detzero
+
+# Install PyTorch 1.10 with CUDA 11.1 via conda
 echo "Installing PyTorch 1.10 + CUDA 11.1..."
-pip3 install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.0 -f https://download.pytorch.org/whl/torch_stable.html
-
-# Install NumPy (compatible version)
-pip3 install "numpy<1.24"
+conda install pytorch==1.10.0 torchvision==0.11.0 torchaudio==0.10.0 cudatoolkit=11.1 -c pytorch -c conda-forge -y
 
 # Install other Python dependencies
 echo "Installing Python dependencies..."
-pip3 install scipy pyyaml easydict tqdm tensorboard
+pip install scipy pyyaml easydict tqdm tensorboard
 
 # Install spconv for CUDA 11.1
 echo "Installing spconv-cu111..."
-pip3 install spconv-cu111
+pip install spconv-cu111
 
 # Install Waymo evaluation
 echo "Installing Waymo evaluation..."
-pip3 install waymo-open-dataset-tf-2-5-0
+pip install waymo-open-dataset-tf-2-5-0
 
 # Clone DetZero repository
 echo "Cloning DetZero repository..."
@@ -93,16 +104,20 @@ echo 'export PYTHONPATH="${PYTHONPATH}:${HOME}/DetZero/detection:${HOME}/DetZero
 
 # Build CUDA extensions
 echo "Building CUDA extensions..."
+echo "Activating conda environment..."
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+conda activate detzero
+
 cd ~/DetZero/utils
-python3 setup.py develop --user
+python setup.py develop --user
 
 cd ~/DetZero/detection
-python3 setup.py develop --user
+python setup.py develop --user
 
 # Verify extensions
 echo "Verifying CUDA extensions..."
-python3 -c "from detzero_utils.ops.roiaware_pool3d import roiaware_pool3d_cuda; print('✓ Utils extensions loaded')"
-python3 -c "from detzero_det.ops.iou3d_nms import iou3d_nms_utils; print('✓ Detection extensions loaded')"
+python -c "from detzero_utils.ops.roiaware_pool3d import roiaware_pool3d_cuda; print('✓ Utils extensions loaded')"
+python -c "from detzero_det.ops.iou3d_nms import iou3d_nms_utils; print('✓ Detection extensions loaded')"
 
 # Create data directory
 mkdir -p ~/waymo_8k
@@ -119,7 +134,9 @@ echo "CUDA Version:"
 nvcc --version
 echo ""
 echo "PyTorch Info:"
-python3 -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA Available: {torch.cuda.is_available()}'); print(f'CUDA Version: {torch.version.cuda}')"
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+conda activate detzero
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA Available: {torch.cuda.is_available()}'); print(f'CUDA Version: {torch.version.cuda}')"
 echo ""
 echo "Disk Space:"
 df -h ~
@@ -132,6 +149,7 @@ echo "   gcloud compute scp --recurse /local/path/waymo_8k detzero-v100-training
 echo ""
 echo "2. Start training in tmux:"
 echo "   tmux new -s training"
+echo "   conda activate detzero"
 echo "   cd ~/DetZero && bash scripts/train_8k_waymo_v100.sh"
 echo "   # Detach: Ctrl+B then D"
 echo "   # Reattach: tmux attach -t training"

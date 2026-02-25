@@ -1,0 +1,20 @@
+name: detzero
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pytorch=1.10.0
+  - torchvision=0.11.0
+  - torchaudio=0.10.0
+  - cudatoolkit=11.1
+  - pip
+  - pip:
+    - scipy
+    - pyyaml
+    - easydict
+    - tqdm
+    - tensorboard
+    - spconv-cu111
+    - waymo-open-dataset-tf-2-5-0

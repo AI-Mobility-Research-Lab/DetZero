@@ -1,6 +1,10 @@
 #!/bin/bash
 # Training script optimized for V100 GPU (16GB VRAM)
 
+# Activate conda environment
+eval "$(conda shell.bash hook)"
+conda activate detzero
+
 cd detection
 
 # Training configuration for V100
