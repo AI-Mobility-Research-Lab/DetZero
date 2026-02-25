@@ -15,7 +15,7 @@ WORKERS=6
 EXTRA_TAG="waymo_8k_v100"
 
 # V100 optimization settings
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+# Note: expandable_segments not supported in PyTorch 1.10
 export CUDA_LAUNCH_BLOCKING=0
 
 echo "=========================================="
