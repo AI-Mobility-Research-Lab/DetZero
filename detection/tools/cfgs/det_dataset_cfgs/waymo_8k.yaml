@@ -1,5 +1,5 @@
 DATASET: 'WaymoDetectionDataset'
-DATA_PATH: '/home/aimob/projects/DetZero/data/waymo_8k'
+DATA_PATH: '/home/aimob/DetZero/data/waymo_8k'
 PROCESSED_DATA_TAG: 'waymo_processed_data'
 
 POINT_CLOUD_RANGE: [-75.2, -75.2, -2, 75.2, 75.2, 4]
