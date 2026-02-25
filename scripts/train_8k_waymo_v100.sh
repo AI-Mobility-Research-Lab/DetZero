@@ -9,7 +9,7 @@ cd detection
 
 # Training configuration for V100
 CFG_FILE="tools/cfgs/det_model_cfgs/centerpoint_1sweep_8k.yaml"
-BATCH_SIZE=4  # V100 16GB can handle batch size 4
+BATCH_SIZE=2  # Reduced to 2 to avoid OOM on V100 16GB
 EPOCHS=30
 WORKERS=6
 EXTRA_TAG="waymo_8k_v100"
@@ -22,11 +22,11 @@ echo "=========================================="
 echo "Training CenterPoint on V100"
 echo "=========================================="
 echo "Config: $CFG_FILE"
-echo "Batch size: $BATCH_SIZE (optimized for V100 16GB)"
+echo "Batch size: $BATCH_SIZE (reduced to avoid OOM)"
 echo "Epochs: $EPOCHS"
 echo "Workers: $WORKERS"
 echo "Tag: $EXTRA_TAG"
-echo "Expected training time: ~4-5 hours"
+echo "Expected training time: ~8-10 hours (with batch size 2)"
 echo "=========================================="
 
 # Check GPU
