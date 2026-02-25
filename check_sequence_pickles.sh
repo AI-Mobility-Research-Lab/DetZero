@@ -8,15 +8,17 @@ echo ""
 find ~/DetZero/data/waymo_8k/waymo_processed_data -name "*.pkl" | head -5 | while read pkl_file; do
     echo "Found: $pkl_file"
     
-    python3 << PYEOF
+    python3 << 'PYEOF'
 import pickle
 import os
+import sys
 
+pkl_file = sys.argv[1]
 try:
-    with open('$pkl_file', 'rb') as f:
+    with open(pkl_file, 'rb') as f:
         data = pickle.load(f)
-    if len(data) > 0 and 'point_cloud' in data[0] and 'lidar_path' in data[0]['point_cloud']:
-        path = data[0]['point_cloud']['lidar_path']
+    if len(data) > 0 and 'lidar_path' in data[0]:
+        path = data[0]['lidar_path']
         print(f"  Samples: {len(data)}")
         print(f"  Sample path: {path}")
         print(f"  Has wrong path: {'/home/aimob/projects/DetZero/' in path}")
@@ -24,7 +26,7 @@ try:
         print(f"  Samples: {len(data)}")
 except Exception as e:
     print(f"  Error: {e}")
-PYEOF
+PYEOF "$pkl_file"
     echo ""
 done
 
